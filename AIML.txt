@@ -1,0 +1,751 @@
+AIML
+
+*****************************************************************************************************************************************************************************************************************************************************
+1.BFS
+
+from collections import deque
+def bfs(k, a, n):
+
+    visited = [False] * n
+    queue = deque()
+    queue.append(k)
+    visited[k] = True
+
+    while queue:
+        k = queue.popleft()
+        print(k, "->", end=" ")
+       
+
+  			for i in range(n):
+            if a[k][i] == 1 and not visited[i]:
+                queue.append(i)
+                visited[i] = True
+
+if _name_ == "_main_":
+    n = int(input("Enter n: "))
+    a = []
+
+    print("Enter adjacency matrix:")
+    for i in range(n):
+        row = list(map(int, input().split()))
+        a.append(row)
+
+    key = int(input("Enter key: "))
+    
+    bfs(key, a,n)
+    
+***********************************************************************************************************************************************************************************************************************************************************
+  
+  2.DFS
+  
+  
+def dfs(k, a, n, visited):
+    print(k, "->", end=" ")
+    visited[k] = True
+
+    for i in range(n):
+        if a[k][i] == 1 and not visited[i]:
+            dfs(i, a, n, visited)
+
+if name == "main":
+    n = int(input("Enter n: "))
+    a = []
+
+    print("Enter adjacency matrix:")
+    for i in range(n):
+        row = list(map(int, input().split()))
+        a.append(row)
+
+    visited = [False] * n
+    key = int(input("Enter start element: "))
+    dfs(key, a, n, visited)
+    
+***********************************************************************************************************************************************************************************************************************************************************
+    
+3.WATER JUG PROBLEM
+    
+//water jug
+from collections import deque
+def Solution(a, b, target):
+	m = {}math.log(len(scores), 2)
+	isSolvable = False
+	path = []
+
+	q = deque()
+
+	
+	q.append((0, 0))
+
+	while (len(q) > 0):
+
+		# Current state
+		u = q.popleft()
+		if ((u[0], u[1]) in m):
+			continue
+		if ((u[0] > a or u[1] > b or
+			u[0] < 0 or u[1] < 0)):
+			continue
+		path.append([u[0], u[1]])
+
+		m[(u[0], u[1])] = 1
+
+		if (u[0] == target or u[1] == target):
+			isSolvable = True
+
+			if (u[0] == target):
+				if (u[1] != 0):
+					path.append([u[0], 0])
+			else:
+				if (u[0] != 0):
+
+					path.append([0, u[1]])
+
+			sz = len(path)
+			for i in range(sz):
+				print("(", path[i][0], ",",
+					path[i][1], ")")
+			break
+
+		q.append([u[0], b]) # Fill Jug2
+		q.append([a, u[1]]) # Fill Jug1
+
+		for ap in range(max(a, b) + 1):
+			c = u[0] + ap
+			d = u[1] - ap
+
+			if (c == a or (d == 0 and d >= 0)):
+				q.append([c, d])
+
+			c = u[0] - ap
+			d = u[1] + ap
+
+			if ((c == 0 and c >= 0) or d == b):
+				q.append([c, d])
+
+		q.append([a, 0])
+
+		q.append([0, b])
+
+	if (not isSolvable):
+		print("Solution not possible")
+
+if _name_ == '_main_':
+
+	Jug1, Jug2, target = 4, 3, 2
+	print("Path from initial state "
+		"to solution state ::")
+
+	Solution(Jug1, Jug2, target)
+    
+*******************************************************************************************************************************************************************************************************************************************************************
+4.ALPHA-BETA PRUINING
+
+MAX, MIN = 1000, -1000
+
+def minimax(depth, nodeIndex, maximizingPlayer, values, alpha, beta):
+    if depth == 3:
+        return values[nodeIndex]
+
+    if maximizingPlayer:
+        best = MIN
+        for i in range(0, 2):
+            val = minimax(depth + 1, nodeIndex * 2 + i, False, values, alpha, beta)
+            best = max(best, val)
+            alpha = max(alpha, best)
+            if beta <= alpha:
+                break
+        return best
+    else:
+        best = MAX
+        for i in range(0, 2):
+            val = minimax(depth + 1, nodeIndex * 2 + i, True, values, alpha, beta)
+            best = min(best, val)
+            beta = min(beta, best)
+            if beta <= alpha:
+                break
+        return best
+        
+      
+if _name_ == "_main_":
+    values = [3, 5, 6, 9, 1, 2, 0, -1]
+    print("The optimal value is :", minimax(0, 0, True, values, MIN, MAX))
+    
+    
+************************************************************************************************************************************************************
+5.TIC-TAC-TOE
+
+def ConstBoard(board):
+    print("Current State Of Board: \n\n")
+    for i in range(0, 9):
+        if ((i > 0) and (i % 3) == 0):
+            print("\n")
+        if (board[i] == 0):
+            print("- ", end=" ")
+        if (board[i] == 1):
+            print("O ", end=" ")
+        if (board[i] == -1):
+            print("X ", end=" ")
+    print("\n\n")
+
+
+def User1Turn(board):
+    pos = input("Enter X's position from [1...9]: ")
+    pos = int(pos)
+    if (board[pos - 1] != 0):
+        print("Wrong Move!!!")
+        exit(0)
+    board[pos - 1] = -1
+
+
+def User2Turn(board):
+    pos = input("Enter O's position from [1...9]: ")
+    pos = int(pos)
+    if (board[pos - 1] != 0):
+        print("Wrong Move!!!")
+        exit(0)
+    board[pos - 1] = 1
+
+
+def minimax(board, player):
+    x = analyzeboard(board)
+    if (x != 0):
+        return (x * player)
+    pos = -1
+    value = -2
+    for i in range(0, 9):
+        if (board[i] == 0):
+            board[i] = player
+            score = -minimax(board, (player * -1))
+            if (score > value):
+                value = score
+                pos = i
+            board[i] = 0
+
+    if (pos == -1):
+        return 0
+    return value
+
+
+def CompTurn(board):
+    pos = -1
+    value = -2
+    for i in range(0, 9):
+        if (board[i] == 0):
+            board[i] = 1
+            score = -minimax(board, -1)
+            board[i] = 0
+            if (score > value):
+                value = score
+                pos = i
+
+    board[pos] = 1
+
+
+def analyzeboard(board):
+    cb = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
+
+    for i in range(0, 8):
+        if (board[cb[i][0]] != 0 and
+                board[cb[i][0]] == board[cb[i][1]] and
+                board[cb[i][0]] == board[cb[i][2]]):
+            return board[cb[i][2]]
+    return 0
+
+
+def main():
+    choice = input("Enter 1 for single player, 2 for multiplayer: ")
+    choice = int(choice)
+    board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    if (choice == 1):
+        print("Computer : O Vs. You : X")
+        player = input("Enter to play 1(st) or 2(nd) :")
+        player = int(player)
+        for i in range(0, 9):
+            if (analyzeboard(board) != 0):
+                break
+            if ((i + player) % 2 == 0):
+                CompTurn(board)
+            else:
+                ConstBoard(board)
+                User1Turn(board)
+    else:
+        for i in range(0, 9):
+            if (analyzeboard(board) != 0):
+                break
+            if ((i) % 2 == 0):
+                ConstBoard(board)
+                User1Turn(board)
+            else:
+                ConstBoard(board)
+                User2Turn(board)
+
+    x = analyzeboard(board)
+    if (x == 0):
+        ConstBoard(board)
+        print("Draw!!!")
+    if (x == -1):
+        ConstBoard(board)
+        print("X Wins!!! Y Loose !!!")
+    if (x == 1):
+        ConstBoard(board)
+        print("X Loose!!! O Wins !!!!")
+
+main()
+    
+******************************************************************************************************************************************************************************************************************************
+
+6.8 PUZZLE
+
+import copy
+from heapq import heappush, heappop
+
+n = 3
+rows = [1, 0, -1, 0]
+cols = [0, -1, 0, 1]
+
+
+class priorityQueue:
+    def _init_(self):
+        self.heap = []
+
+    def push(self, key):
+        heappush(self.heap, key)
+
+    def pop(self):
+        return heappop(self.heap)
+
+    def empty(self):
+        if not self.heap:
+            return True
+        else:
+            return False
+
+
+class nodes:
+    def _init_(self, parent, mats, empty_tile_posi, costs, levels):
+        self.parent = parent
+        self.mats = mats
+        self.empty_tile_posi = empty_tile_posi
+        self.costs = costs
+        self.levels = levels
+
+    def _lt_(self, nxt):
+        return self.costs < nxt.costs
+
+
+def calculateCosts(mats, final) -> int:
+    count = 0
+    for i in range(n):
+        for j in range(n):
+            if (mats[i][j]) and (mats[i][j] != final[i][j]):
+                count += 1
+    return count
+
+
+def newNodes(mats, empty_tile_posi, new_empty_tile_posi, levels, parent, final) -> nodes:
+    new_mats = copy.deepcopy(mats)
+    x1 = empty_tile_posi[0]
+    y1 = empty_tile_posi[1]
+    x2 = new_empty_tile_posi[0]
+    y2 = new_empty_tile_posi[1]
+    new_mats[x1][y1], new_mats[x2][y2] = new_mats[x2][y2], new_mats[x1][y1]
+    costs = calculateCosts(new_mats, final)
+    new_nodes = nodes(parent, new_mats, new_empty_tile_posi, costs, levels)
+    return new_nodes
+
+
+def printMatsrix(mats):
+    for i in range(n):
+        for j in range(n):
+            print("%d " % (mats[i][j]), end=" ")
+        print()
+
+
+def isSafe(x, y):
+    return x >= 0 and x < n and y >= 0 and y < n
+
+
+def printPath(root):
+    if root == None:
+        return
+    printPath(root.parent)
+    printMatsrix(root.mats)
+    print()
+
+
+def solve(initial, empty_tile_posi, final):
+    pq = priorityQueue()
+    costs = calculateCosts(initial, final)
+    root = nodes(None, initial, empty_tile_posi, costs, 0)
+    pq.push(root)
+
+    while not pq.empty():
+        minimum = pq.pop()
+        if minimum.costs == 0:
+            printPath(minimum)
+            return
+
+        for i in range(n):
+            new_tile_posi = [
+                minimum.empty_tile_posi[0] + rows[i],
+                minimum.empty_tile_posi[1] + cols[i],
+            ]
+            if isSafe(new_tile_posi[0], new_tile_posi[1]):
+                child = newNodes(
+                    minimum.mats,
+                    minimum.empty_tile_posi,
+                    new_tile_posi,
+                    minimum.levels + 1,
+                    minimum,
+                    final,
+                )
+                pq.push(child)
+
+
+initial = [[1, 2, 3], [5, 6, 0], [7, 8, 4]]
+final = [[1, 2, 3], [5, 8, 6], [0, 7, 4]]
+empty_tile_posi = [1, 2]
+solve(initial, empty_tile_posi, final)
+
+*********************************************************************************************************************************************************************************************************************************************
+
+7.MIN-MAX
+
+import math
+def minimax (curDepth, nodeIndex,maxTurn, scores, targetDepth):
+       
+	if (curDepth == targetDepth): 
+		return scores[nodeIndex]
+	if (maxTurn):
+		return max(minimax(curDepth + 1, nodeIndex * 2, 
+					False, scores, targetDepth), 
+				minimax(curDepth + 1, nodeIndex * 2 + 1, 
+					False, scores, targetDepth))
+	else:
+		return min(minimax(curDepth + 1, nodeIndex * 2, 
+					True, scores, targetDepth), 
+				minimax(curDepth + 1, nodeIndex * 2 + 1, 
+					True, scores, targetDepth))
+
+scores = [3, 5, 2, 9, 12, 5, 23, 23]
+treeDepth = math.log(len(scores), 2)
+
+print("The optimal value is : ", end = "")
+print(minimax(0, 0, True, scores, treeDepth))
+
+***********************************************************************************************************************************************************************************************************************************************************
+8.WATER JUG SMALL CODE
+from collections import defaultdict
+#  jug1, jug2, aim = 4, 3, 2
+
+jug1 = int(input("Enter Value of Jug 1 : "))
+jug2 = int(input("Enter Value of Jug 2 : "))
+aim = int(input("Enter Value of aim : "))
+
+visited = defaultdict(lambda: False)
+
+def waterJugSolver(amt1, amt2):
+  if (amt1 == aim and amt2 == 0) or (amt2 == aim and amt1 == 0):
+    print(amt1, amt2)
+    return True
+  if visited[(amt1, amt2)] == False:
+    print(amt1, amt2)
+    visited[(amt1, amt2)] = True
+    return (waterJugSolver(0, amt2)     or
+            waterJugSolver(amt1, 0)     or
+            waterJugSolver(jug1, amt2)  or
+            waterJugSolver(amt1, jug2)  or
+            waterJugSolver(amt1 + min(amt2, (jug1-amt1)),amt2 - min(amt2, (jug1-amt1)))  or
+            waterJugSolver(amt1 - min(amt1, (jug2-amt2)),amt2 + min(amt1, (jug2-amt2))) )
+  else:
+return False
+
+print("Steps: ")
+waterJugSolver(0, 0)
+**************************************************************************************************************************************************************************************************************
+9.MISSIONARIES AND CANNIBAL
+from collections import deque
+
+def is_valid(state):
+    m, c, b = state
+    return (m >= 0 and c >= 0 and (m == 0 or m >= c) and
+            (3 - m) >= 0 and (3 - c) >= 0 and (3 - m == 0 or (3 - m) >= (3 - c)))
+
+def successors(state):
+    m, c, b = state
+    next_states = []
+    if b == 1:
+        next_states.extend([(m - 1, c, 0), (m, c - 1, 0), (m - 1, c - 1, 0), (m - 2, c, 0), (m, c - 2, 0)])
+    else:
+        next_states.extend([(m + 1, c, 1), (m, c + 1, 1), (m + 1, c + 1, 1), (m + 2, c, 1), (m, c + 2, 1)])
+    return [state for state in next_states if is_valid(state)]
+
+def breadth_first_search():
+    start_state = (3, 3, 1)
+    goal_state = (0, 0, 0)
+    queue = deque([(start_state, [start_state])])
+    visited = set()
+
+    while queue:
+        current_state, path = queue.popleft()
+        if current_state == goal_state:
+            return path
+        if current_state not in visited:
+            visited.add(current_state)
+            for next_state in successors(current_state):
+                queue.append((next_state, path + [next_state]))
+
+if __name__ == "__main__":
+    solution = breadth_first_search()
+    print("Solution:")
+    for state in solution:
+        print(state)
+
+********************************************************************************************************************************************************************************************************
+10.N-QUEENS
+
+
+ 
+global N
+N = 4
+ 
+ 
+def printSolution(board):
+    for i in range(N):
+        for j in range(N):
+            if board[i][j] == 1:
+                print("Q",end=" ")
+            else:
+                print(".",end=" ")
+        print()
+ 
+ 
+
+def isSafe(board, row, col):
+ 
+    # Check this row on left side
+    for i in range(col):
+        if board[row][i] == 1:
+            return False
+ 
+
+    for i, j in zip(range(row, -1, -1),
+                    range(col, -1, -1)):
+        if board[i][j] == 1:
+            return False
+ 
+    for i, j in zip(range(row, N, 1),
+                    range(col, -1, -1)):
+        if board[i][j] == 1:
+            return False
+ 
+    return True
+ 
+ 
+def solveNQUtil(board, col):
+ 
+   
+
+    if col >= N:
+        return True
+ 
+    # Consider this column and try placing
+    # this queen in all rows one by one
+    for i in range(N):
+ 
+        if isSafe(board, i, col):
+  
+           
+            board[i][col] = 1
+ 
+            if solveNQUtil(board, col + 1) == True:
+                return True
+ 
+          
+            board[i][col] = 0
+ 
+  
+    return False
+ 
+ 
+
+def solveNQ():
+    board = [[0, 0, 0, 0],
+             [0, 0, 0, 0],
+             [0, 0, 0, 0],
+             [0, 0, 0, 0]]
+ 
+    if solveNQUtil(board, 0) == False:
+        print("Solution does not exist")
+        return False
+ 
+    printSolution(board)
+    return True
+ 
+
+if __name__ == '__main__':
+    solveNQ()
+ 
+ 
+ 
+ 
+#A*-algorithm
+
+class Node:
+    def __init__(self,data,level,fval):
+        """ Initialize the node with the data, level of the node and the calculated fvalue """
+        self.data = data
+        self.level = level
+        self.fval = fval
+    def generate_child(self):
+        """ Generate child nodes from the given node by moving the blank space
+            either in the four directions {up,down,left,right} """
+        x,y = self.find(self.data,'_')
+        """ val_list contains position values for moving the blank space in either of
+            the 4 directions [up,down,left,right] respectively. """
+        val_list = [[x,y-1],[x,y+1],[x-1,y],[x+1,y]]
+        children = []
+        for i in val_list:
+            child = self.shuffle(self.data,x,y,i[0],i[1])
+            if child is not None:
+                child_node = Node(child,self.level+1,0)
+                children.append(child_node)
+        return children
+        
+    def shuffle(self,puz,x1,y1,x2,y2):
+        """ Move the blank space in the given direction and if the position value are out
+            of limits the return None """
+        if x2 >= 0 and x2 < len(self.data) and y2 >= 0 and y2 < len(self.data):
+            temp_puz = []
+            temp_puz = self.copy(puz)
+            temp = temp_puz[x2][y2]
+            temp_puz[x2][y2] = temp_puz[x1][y1]
+            temp_puz[x1][y1] = temp
+            return temp_puz
+        else:
+            return None
+    def copy(self,root):
+        """ Copy function to create a similar matrix of the given node"""
+        temp = []
+        for i in root:
+            t = []
+            for j in i:
+                t.append(j)
+            temp.append(t)
+        return temp    
+            
+    def find(self,puz,x):
+        """ Specifically used to find the position of the blank space """
+        for i in range(0,len(self.data)):
+            for j in range(0,len(self.data)):
+                if puz[i][j] == x:
+                    return i,j
+class Puzzle:
+    def __init__(self,size):
+        """ Initialize the puzzle size by the specified size,open and closed lists to empty """
+        self.n = size
+        self.open = []
+        self.closed = []
+    def accept(self):
+        """ Accepts the puzzle from the user """
+        puz = []
+        for i in range(0,self.n):
+            temp = input().split(" ")
+            puz.append(temp)
+        return puz
+    def f(self,start,goal):
+        """ Heuristic Function to calculate hueristic value f(x) = h(x) + g(x) """
+        return self.h(start.data,goal)+start.level
+    def h(self,start,goal):
+        """ Calculates the different between the given puzzles """
+        temp = 0
+        for i in range(0,self.n):
+            for j in range(0,self.n):
+                if start[i][j] != goal[i][j] and start[i][j] != '_':
+                    temp += 1
+        return temp
+    def process(self):
+        """ Accept Start and Goal Puzzle state"""
+        print("Enter the start state matrix \n")
+        start = self.accept()
+        print("Enter the goal state matrix \n")        
+        goal = self.accept()
+        start = Node(start,0,0)
+        start.fval = self.f(start,goal)
+        """ Put the start node in the open list"""
+        self.open.append(start)
+        print("\n\n")
+        while True:
+            cur = self.open[0]
+            print("")
+            print("  | ")
+            print("  | ")
+            print(" \\\'/ \n")
+            for i in cur.data:
+                for j in i:
+                    print(j,end=" ")
+                print("")
+            """ If the difference between current and goal node is 0 we have reached the goal node"""
+            if(self.h(cur.data,goal) == 0):
+                break
+            for i in cur.generate_child():
+                i.fval = self.f(i,goal)
+                self.open.append(i)
+            self.closed.append(cur)
+            del self.open[0]
+            self.open.sort(key = lambda x:x.fval,reverse=False)
+puz = Puzzle(3)
+puz.process()
+water jug
+
+/***********************************************
+Genetic Algorithm
+import random
+
+# Define the fitness function
+f = lambda x: x**2
+
+# Genetic Algorithm Parameters
+pop, mut, gen, space = 100, 0.1, 100, (-10, 10)
+
+# Initialize the initial population with random solutions within the search space
+p = [random.uniform(*space) for _ in range(pop)]
+
+# Main Genetic Algorithm Loop
+for _ in range(gen):
+    # Create a new population for the next generation
+    new_population = []
+
+    # Iterate through the current population
+    for _ in range(pop):
+        # Select two parents based on their fitness using random.choices
+        parent1 = random.choices(p, [f(x) for x in p])[0]
+        parent2 = random.choices(p, [f(x) for x in p])[0]
+
+        # Create a child by averaging the parents' values
+        child = (parent1 + parent2) / 2
+
+        # Apply mutation to the child with a certain probability
+        if random.random() < mut:
+            child += random.uniform(-0.1, 0.1)
+
+        # Add the child to the new population
+        new_population.append(child)
+
+    # Update the population with the new generation
+    p = new_population
+
+    #To print the species
+    #print(p)
+
+# Find the best solution in the final population
+best_solution = min(p, key=f)
+best_fitness = f(best_solution)
+
+# Print the best solution and its fitness
+print(f"Best Solution: {best_solution}")
+print(f"Best Fitness: {best_fitness}")
+
+    
+    
+    
