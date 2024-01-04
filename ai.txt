@@ -1,0 +1,256 @@
+4.ALPHA-BETA PRUINING
+
+MAX, MIN = 1000, -1000
+count1=0
+count2=0
+def minimax(depth, nodeIndex, maximizingPlayer, values, alpha, beta):
+    global count1,count2;
+    if depth == 3:
+        return values[nodeIndex]
+    if maximizingPlayer:
+        best = MIN
+        for i in range(0, 2):
+            val = minimax(depth + 1, nodeIndex * 2 + i, False, values, alpha, beta)
+            best = max(best, val)
+            alpha = max(alpha, best)
+            if beta <= alpha:
+                count1+=1
+        return best
+    else:
+        best = MAX
+        for i in range(0, 2):
+            val = minimax(depth + 1, nodeIndex * 2 + i, True, values, alpha, beta)
+            best = min(best, val)
+            beta = min(beta, best)
+            if beta <= alpha:
+                count2+=1
+        return best
+
+if __name__ == "__main__":
+    values = [3, 5, 6, 9, 1, 2, 0, -1]
+    print("The optimal value is :", minimax(0, 0, True, values, MIN, MAX))
+    print("no. of alpha cuts :" ,count1)
+    print("no. of beta cuts :" ,count2)
+    
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+7.MIN-MAX
+
+import math
+def minimax (curDepth, nodeIndex,maxTurn, scores, targetDepth):
+       
+	if (curDepth == targetDepth): 
+		return scores[nodeIndex]
+	if (maxTurn):
+		return max(minimax(curDepth + 1, nodeIndex * 2, 
+					False, scores, targetDepth), 
+				minimax(curDepth + 1, nodeIndex * 2 + 1, 
+					False, scores, targetDepth))
+	else:
+		return min(minimax(curDepth + 1, nodeIndex * 2, 
+					True, scores, targetDepth), 
+				minimax(curDepth + 1, nodeIndex * 2 + 1, 
+					True, scores, targetDepth))
+
+scores = [3, 5, 2, 9, 12, 5, 23, 23]
+treeDepth = math.log(len(scores), 2)
+
+print("The optimal value is : ", end = "")
+print(minimax(0, 0, True, scores, treeDepth))
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+LWR
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+
+# Load the tips dataset
+tips = pd.read_csv('tips.csv')
+
+# Define the features (X) and target variable (y)
+X = tips['total_bill']
+y = tips['tip']
+
+# Function for locally weighted regression
+def locally_weighted_regression(x, y, x0, tau):
+    m = len(x)
+    weights = np.exp(-((x - x0)*2) / (2 * tau*2))
+    X = sm.add_constant(x)  # Add a constant term for intercept
+    model = sm.WLS(y, X, weights=weights)
+    result = model.fit()
+    y_pred = result.predict([1, x0])  # Predict the value at x0
+    return y_pred
+
+# Choose a query point for prediction
+query_point = 20.0
+
+# Set bandwidth (tau) for the local weighting
+tau = 5.0
+
+# Perform locally weighted regression
+predicted_value = locally_weighted_regression(X, y, query_point, tau)
+
+# Plot the results
+plt.scatter(X, y, label='Actual Data')
+plt.plot(X, result.fittedvalues, color='blue', label='Ordinary Least Squares (OLS) Regression')
+plt.scatter(query_point, predicted_value, color='red', marker='x', label='Locally Weighted Regression')
+
+plt.title('Locally Weighted Regression')
+plt.xlabel('Total Bill')
+plt.ylabel('Tip')
+plt.legend()
+plt.show()
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Perceptron
+
+from sklearn.linear_model import Perceptron
+import numpy as np
+
+# AND gate training data
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+y = np.array([0, 0, 0, 1])
+
+# Create a Perceptron classifier
+clf = Perceptron(max_iter=1000, tol=1e-3)
+
+# Train the Perceptron
+clf.fit(X, y)
+
+# Test the Perceptron
+test_data = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+predictions = clf.predict(test_data)
+
+for i in range(len(test_data)):
+    print(f"Input: {test_data[i]}, Prediction: {predictions[i]}")
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Genetic 
+
+import random
+
+# Define the fitness function
+f = lambda x: x**2
+
+# Genetic Algorithm Parameters
+pop, mut, gen, space = 100, 0.1, 100, (-10, 10)
+
+# Initialize the initial population with random solutions within the search space
+p = [random.uniform(*space) for _ in range(pop)]
+
+# Main Genetic Algorithm Loop
+for _ in range(gen):
+    # Create a new population for the next generation
+    new_population = []
+
+    # Iterate through the current population
+    for _ in range(pop):
+        # Select two parents based on their fitness using random.choices
+        parent1 = random.choices(p, [f(x) for x in p])[0]
+        parent2 = random.choices(p, [f(x) for x in p])[0]
+
+        # Create a child by averaging the parents' values
+        child = (parent1 + parent2) / 2
+
+        # Apply mutation to the child with a certain probability
+        if random.random() < mut:
+            child += random.uniform(-0.1, 0.1)
+
+        # Add the child to the new population
+        new_population.append(child)
+
+    # Update the population with the new generation
+    p = new_population
+
+    #To print the species
+    #print(p)
+
+# Find the best solution in the final population
+best_solution = min(p, key=f)
+best_fitness = f(best_solution)
+
+# Print the best solution and its fitness
+print(f"Best Solution: {best_solution}")
+print(f"Best Fitness: {best_fitness}")
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Water jug
+
+def pour_water(juga, jugb):
+  max1, max2, fill = 3, 7, 5
+  print("%d \t%d" % (juga, jugb))
+  if jugb==fill:
+    return
+  elif jugb==max2:
+    pour_water(0, juga)
+  elif juga!=0 and jugb==0:
+    pour_water(0, juga)
+  elif juga==fill:
+    pour_water(juga, 0)
+  elif juga<max1:
+    pour_water(max1, jugb)
+  elif juga<(max2-jugb):
+    pour_water(0, (juga+jugb))
+  else:
+    pour_water(juga-(max2-jugb), jugb+(max2-jugb))
+
+print("Jug A \tJug B")
+pour_water(0,0)
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+EM algorithm
+
+import numpy as np
+from sklearn.mixture import GaussianMixture
+import matplotlib.pyplot as plt
+
+# Generate synthetic data
+np.random.seed(42)
+data = np.concatenate([np.random.normal(0, 1, 300), np.random.normal(5, 1, 200)])
+
+# Reshape the data to a column vector
+data = data.reshape(-1, 1)
+
+# Fit a Gaussian Mixture Model using EM algorithm
+gmm = GaussianMixture(n_components=2, random_state=42)
+gmm.fit(data)
+
+# Predict the cluster assignments
+labels = gmm.predict(data)
+
+# Plot the data and the estimated GMM
+plt.scatter(data, np.zeros_like(data))
+plt.title('Gaussian Mixture Model with EM Algorithm')
+plt.show()
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+KMeans
+
+
+import numpy as np
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+
+# Generate some sample data
+np.random.seed(42)
+X = np.random.rand(100, 2)
+
+# Specify the number of clusters (k)
+k = 3
+
+# Initialize the KMeans model
+kmeans = KMeans(n_clusters=k)
+
+# Fit the model to the data
+kmeans.fit(X)
+
+# Get cluster labels and centroids
+labels = kmeans.labels_
+centroids = kmeans.cluster_centers_
+
+# Plot the data points and centroids
+plt.scatter(X[:, 0], X[:, 1])
+plt.scatter(centroids[:, 0], centroids[:, 1])
+
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.show()
