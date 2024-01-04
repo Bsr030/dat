@@ -1,0 +1,1072 @@
+Find S algorithm:
+
+
+import pandas as pd
+import numpy as np
+
+data = pd.read_csv("enjoysport.csv")
+print(data,"\n")
+
+d = np.array(data)[:,:-1]
+print("\n The attributes are:\n ",d)
+
+target = np.array(data)[:,-1]
+print("\n The target is:\n ",target)
+
+h=[]
+for i in range(len(target)):
+  if target[i]=='Yes':
+    for j in range(len(d[i])):
+      h.append(d[i][j])
+    break
+
+for i in range(len(target)):
+  if target[i]=='Yes':
+    for j in range(len(h)):
+      if h[j]!=d[i][j]:
+        h[j]='?'
+print("the final specific hypothesis is:\n",h)
+-----------------------------------------------------------------------------
+KNN algorithm:
+
+
+
+import pandas as pd
+import numpy as np
+arr=pd.read_csv('iris.csv')
+x=arr.drop('Id',axis="columns")
+a=np.array(x)
+res={}
+row=len(a)
+col=len(a[0])
+print("enter test sample")
+test=[]
+for i in range(col-1):
+    test.append(float(input()))
+for i in range(row):
+    dist=0
+    for j in range(col-1):
+        dist=dist+(test[j]-a[i][j])**2
+    res[dist]=a[i][col-1]
+res=dict(sorted(res.items()))
+print("enter k value")
+k=int(input())
+result=list(res.items())[:k]
+print(result)
+setosa=0
+vercol=0
+vir=0
+for i in range(k):
+    if result[i][1]=='Iris-setosa':
+        setosa+=1
+    elif result[i][1]=='Iris-versicolor':
+        vercol+=1
+    elif result[i][1]=='Iris-virginica':
+        vir+=1
+if max(setosa,vercol,vir)==setosa:
+ print("setosa")
+elif max(setosa,vercol,vir)==vercol:
+ print("versicolor")
+elif max(setosa,vercol,vir)==vir:
+ print("virginia")
+-----------------------------------------------------------------------------------------------
+
+Locally weighted regression:
+
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('tips.csv')
+features = np.array(df.total_bill)
+labels = np.array(df.tip)
+
+def kernel(data, point, xmat, k):
+   m,n = np.shape(xmat)
+   ws = np.mat(np.eye((m)))
+   for j in range(m):
+      diff = point - data[j]
+      ws[j,j] = np.exp(diff*diff.T/(-2.0*k**2))
+   return ws
+
+def local_weight(data, point, xmat, ymat, k):
+   wei = kernel(data, point, xmat, k)
+   return (data.T*(wei*data)).I*(data.T*(wei*ymat.T))
+
+def local_weight_regression(xmat, ymat, k):
+   m,n = np.shape(xmat)
+   ypred = np.zeros(m)
+   for i in range(m):
+      ypred[i] = xmat[i]*local_weight(xmat, xmat[i],xmat,ymat,k)
+   return ypred
+
+m = features.shape[0]
+mtip = np.mat(labels)
+data = np.hstack((np.ones((m, 1)), np.mat(features).T))
+
+ypred = local_weight_regression(data, mtip, 0.5)
+indices = data[:,1].argsort(0)
+xsort = data[indices][:,0]
+
+fig = plt.figure()
+ax = fig.add_subplot(1,1,1)
+ax.scatter(features, labels, color='blue')
+ax.plot(xsort[:,1],ypred[indices], color = 'red', linewidth=3)
+plt.xlabel('Total bill')
+plt.ylabel('Tip')
+plt.show()
+--------------------------------------------------------------------------------------------------------------
+
+Decision tree:
+
+
+
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn import tree
+
+df = pd.read_csv('salaries.csv')
+df.head()
+target = df['salary_more_then_100k']
+inputs = df.drop('salary_more_then_100k',axis = 'columns')
+
+le_company = LabelEncoder()
+le_job = LabelEncoder()
+le_degree = LabelEncoder()
+inputs['company_n'] = le_company.fit_transform(inputs['company'])
+inputs['job_n'] = le_job.fit_transform(inputs['job'])
+inputs['degree_n'] = le_degree.fit_transform(inputs['degree'])
+inputs.head()
+inputs_n = inputs.drop(['company','job','degree'],axis='columns')
+inputs_n
+
+model = tree.DecisionTreeClassifier()
+model.fit(inputs_n,target)
+model.score(inputs_n,target)
+model.predict([[2,1,0]])
+---------------------------------------------------------------------------------------------------------
+perceptron xor:
+
+
+
+
+import numpy as np
+def unitStep(v):
+    if v >= 0:
+        return 1
+    else:
+        return 0
+
+def perceptronModel(x, w, b):
+    v = np.dot(w, x) + b
+    y = unitStep(v)
+    return y
+
+def NOT_logicFunction(x):
+    wNOT = -1
+    bNOT = 0.5
+    return perceptronModel(x, wNOT, bNOT)
+
+def AND_logicFunction(x):
+    w = np.array([1, 1])
+    bAND = -1.5
+    return perceptronModel(x, w, bAND)
+
+def OR_logicFunction(x):
+    w = np.array([1, 1])
+    bOR = -0.5
+    return perceptronModel(x, w, bOR)
+
+def XOR_logicFunction(x):
+    y1 = AND_logicFunction(x)
+    y2 = OR_logicFunction(x)
+    y3 = NOT_logicFunction(y1)
+    final_x = np.array([y2, y3])
+    finalOutput = AND_logicFunction(final_x)
+    return finalOutput
+
+test1 = np.array([0, 1])
+test2 = np.array([1, 1])
+test3 = np.array([0, 0])
+test4 = np.array([1, 0])
+print("XOR({}, {}) = {}".format(0, 1, XOR_logicFunction(test1)))
+print("XOR({}, {}) = {}".format(1, 1, XOR_logicFunction(test2)))
+print("XOR({}, {}) = {}".format(0, 0, XOR_logicFunction(test3)))
+print("XOR({}, {}) = {}".format(1, 0, XOR_logicFunction(test4)))
+-----------------------------------------------------------------------------------
+
+multilayer network:
+
+
+
+import math
+import random
+
+a = 0.01
+
+def activation(y):
+    return 1 / (1 + math.exp(-y))
+
+def activation_derivative(y):
+    return y * (1 - y)
+
+print("Enter the no.of input nodes:")
+i = int(input())
+print("Enter the no.of nodes in hidden layers:")
+h = int(input())
+print("Enter the no.of output nodes:")
+o = int(input())
+
+x = [0] * i
+w = [random.uniform(0.0, 1.0) for _ in range(i * h)]
+v = [random.uniform(0.0, 1.0) for _ in range(h * o)]
+
+for j in range(i):
+    x[j] = int(input("Enter input for node {}: ".format(j)))
+
+p = [0] * h
+q = [0] * o  # Output layer values
+
+# Forward pass through the hidden layer
+for k in range(h):
+    for j in range(i):
+        p[k] += w[k * i + j] * x[j]
+    p[k] = activation(p[k])
+
+# Forward pass through the output layer
+for k in range(o):
+    for j in range(h):
+        q[k] += v[k * h + j] * p[j]
+    q[k] = activation(q[k])
+
+print("Hidden layer outputs:", p)
+print("Output layer outputs:", q)
+
+# Backpropagation
+target = [float(input("Enter target for output node {}: ".format(k))) for k in range(o)]
+output_errors = [target[k] - q[k] for k in range(o)]
+
+# Backpropagate errors through the hidden layer
+hidden_errors = [0] * h
+for j in range(h):
+    for k in range(o):
+        hidden_errors[j] += v[k * h + j] * output_errors[k]
+    hidden_errors[j] *= activation_derivative(p[j])
+
+# Update weights
+for k in range(o):
+    for j in range(h):
+        v[k * h + j] += a * output_errors[k] * p[j]
+
+for k in range(h):
+    for j in range(i):
+        w[k * i + j] += a * hidden_errors[k] * x[j]
+
+print("Updated weights:", w)
+----------------------------------------------------------------------------------------------------------
+
+
+KMEANS:
+
+
+
+import pandas as pd
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+
+
+df = pd.read_csv('iris.csv')
+
+def initialize_centroids(data, k):
+  np.random.seed(0)
+  centroids = data.sample(n=k)
+  return centroids.iloc[:, :-1].values
+
+def euclidean_distance(point1, point2):
+  return math.sqrt(sum((p1 - p2) ** 2 for p1, p2 in zip(point1, point2)))
+
+def assign_to_clusters(data, centroids, k):
+    clusters = [[] for _ in range(k)]
+    for index, row in data.iterrows():
+        point = row[:-1].values
+        distances = [euclidean_distance(point, centroid) for centroid in centroids]
+        closest_cluster = distances.index(min(distances))
+        clusters[closest_cluster].append(point)
+    return clusters
+
+def update_centroids(clusters):
+    new_centroids = []
+    for cluster in clusters:
+        if cluster:
+            new_centroid = np.mean(cluster, axis=0)
+            new_centroids.append(new_centroid)
+    return np.array(new_centroids)
+
+def has_converged(centroids, new_centroids, iteration, max_iterations):
+    if iteration >= max_iterations:
+        return True
+    return np.array_equal(centroids, new_centroids)
+
+def k_means(data, k, max_iterations):
+    centroids = initialize_centroids(data, k)
+    iteration = 0
+
+    while True:
+        clusters = assign_to_clusters(data, centroids, k)
+        new_centroids = update_centroids(clusters)
+
+
+
+        if has_converged(centroids, new_centroids, iteration, max_iterations):
+            break
+
+        centroids = new_centroids
+        iteration += 1
+
+    return centroids, clusters
+
+def plot_clusters(centroids, clusters):
+    colors = ['r', 'g', 'b']
+    for i, cluster in enumerate(clusters):
+        cluster = np.array(cluster)
+        plt.scatter(cluster[:, 0], cluster[:, 1], c=colors[i], label=f'Cluster {i + 1}')
+    plt.scatter(centroids[:, 0], centroids[:, 1], s=100, c='black', marker='X', label='Centroids')
+    plt.xlabel('Sepal Length')
+    plt.ylabel('Sepal Width')
+    plt.legend()
+    plt.show()
+
+centroids, clusters = k_means(df, 3, 100)
+plot_clusters(centroids, clusters)
+------------------------------------------------------------------------------------------------------------------------
+
+EM algorithm:
+
+
+
+import numpy as np
+import pandas as pd
+import math
+import matplotlib.pyplot as plt
+
+def load_iris_data():
+    url = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
+    column_names = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'class']
+    data = pd.read_csv(url, names=column_names)
+    return data
+
+def initialize_parameters(data, k):
+    n_samples, n_features = data.shape
+    np.random.seed(0)
+
+    means = data.sample(n=k).values[:, :-1]
+
+    covariances = [np.identity(n_features - 1) * 1e-3 for _ in range(k)]
+
+    mixing_coefficients = [1.0 / k] * k
+
+    return means, covariances, mixing_coefficients
+
+def calculate_probabilities(data, means, covariances, mixing_coefficients):
+    n_samples, _ = data.shape
+    k = len(means)
+    probabilities = np.zeros((n_samples, k))
+
+    for i in range(k):
+        for j in range(n_samples):
+            diff = data.iloc[j, :-1].values - means[i]
+            inv_covariance = np.linalg.inv(covariances[i])
+            exponent = -0.5 * np.dot(np.dot(diff, inv_covariance), diff)
+            prob = math.exp(exponent) / (2 * math.pi * np.sqrt(np.linalg.det(covariances[i])))
+            probabilities[j, i] = mixing_coefficients[i] * prob
+
+    return probabilities
+
+def update_parameters(data, probabilities):
+    n_samples, _ = data.shape
+    k = probabilities.shape[1]
+
+    means = np.dot(probabilities.T, data.iloc[:, :-1].values) / np.sum(probabilities, axis=0)[:, np.newaxis]
+
+    covariances = []
+    for i in range(k):
+        diff = data.iloc[:, :-1].values - means[i]
+        weighted_diff = (diff.T * probabilities[:, i]).T
+        cov = np.dot(weighted_diff.T, diff) / np.sum(probabilities[:, i])
+        covariances.append(cov)
+
+    mixing_coefficients = np.mean(probabilities, axis=0) / n_samples
+
+    return means, covariances, mixing_coefficients
+
+def has_converged(means, new_means, tolerance=1e-4):
+    return np.all(np.abs(means - new_means) < tolerance)
+
+def em_algorithm(data, k, max_iterations):
+    means, covariances, mixing_coefficients = initialize_parameters(data, k)
+    iteration = 0
+
+    while iteration < max_iterations:
+        probabilities = calculate_probabilities(data, means, covariances, mixing_coefficients)
+        new_means, new_covariances, new_mixing_coefficients = update_parameters(data, probabilities)
+
+        if has_converged(means, new_means):
+            break
+
+        means, covariances, mixing_coefficients = new_means, new_covariances, new_mixing_coefficients
+        iteration += 1
+
+    return means, covariances, mixing_coefficients
+
+def plot_clusters(data, means):
+    plt.scatter(data['sepal_length'], data['sepal_width'], c='b', label='Data Points')
+    plt.scatter(means[:, 0], means[:, 1], s=100, c='r', marker='X', label='Cluster Centers')
+    plt.xlabel('Sepal Length')
+    plt.ylabel('Sepal Width')
+    plt.legend()
+    plt.show()
+
+
+iris_data = load_iris_data()
+k = 3
+max_iterations = 100
+means, _, _ = em_algorithm(iris_data, k, max_iterations)
+plot_clusters(iris_data, means)
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+BFS:
+
+graph = {
+  'A' : ['B','C'],
+  'B' : ['D', 'E'],
+  'C' : ['F', 'G'],
+  'D' : [],
+  'E' : [],
+  'F' : [],
+  'G' : []
+}
+
+visited = []
+queue = []
+
+def bfs(visited, graph, node):
+  queue.append(node)
+  print("Frontier: ",queue)
+  visited.append(node)
+  print("Explored:",visited)
+
+  while queue:
+    m = queue.pop(0)
+    print(m)
+
+    for neighbour in graph[m]:
+      if neighbour not in visited:
+        queue.append(neighbour)
+        print("Frontier: ",queue)
+        visited.append(neighbour)
+        print("Explored:",visited)
+
+
+print("Following is the Breadth-First Search")
+bfs(visited, graph, 'A')
+
+---------------------------------------------------------------
+DFS:'
+
+graph = {
+    'A' : ['B','C'],
+    'B' : ['D', 'E'],
+    'C' : ['F', 'G'],
+    'D' : [],
+    'E' : [],
+    'F' : [],
+    'G' : []
+}
+
+
+visited = []
+frontier=[]
+def dfs(visited, graph, node):
+    if node not in visited:
+        print (node)
+        visited.append(node)
+        print("explored: " ,visited)
+        for neighbour in graph[node]:
+          frontier.insert(len(visited)-1,neighbour)
+          print("frontier:" ,frontier)
+          dfs(visited, graph, neighbour)
+
+
+dfs(visited, graph, 'A')
+------------------------------------------------------------------
+DLS:
+
+
+graph = {
+    'A' : ['B','C'],
+    'B' : ['D', 'E'],
+    'C' : ['F', 'G'],
+    'D' : ['H','I'],
+    'E' : ['J','K'],
+    'F' : [],
+    'G' : []
+}
+
+depth = {'A' : 0, 'B' : 1,'C' : 1,'D' : 2,'E' : 2,'F' : 2,'G' : 2 ,'H':3, 'I':3, 'J':3 , 'K':3}
+depth_limit =2
+visited = []
+frontier=[]
+def dls(visited, graph, node):
+    if node not in visited and depth[node]<=depth_limit:
+        print (node)
+        visited.append(node)
+        # print("explored: " ,end=" ")
+        # print(visited)
+        for neighbour in graph[node]:
+          frontier.insert(len(visited)-1,neighbour)
+          # print("frontier:" ,end=" ")
+          # print(frontier)
+          dls(visited, graph, neighbour)
+
+
+dls(visited, graph, 'A')
+-----------------------------------------------------------------------------------
+IDDFS:
+
+
+
+import sys
+
+graph = {
+    'A' : ['B','C'],
+    'B' : ['D', 'E'],
+    'C' : ['F', 'G'],
+    'D' : ['H','I'],
+    'E' : ['J','K'],
+    'F' : [],
+    'G' : [],
+    'H' : [] ,
+    'I' : [],
+    'J': [],
+    'K': []}
+limit=0
+search= 'H'
+depth = {'A' : 0, 'B' : 1,'C' : 1,'D' : 2,'E' : 2,'F' : 2,'G' : 2 ,'H':3, 'I':3, 'J':3 , 'K':3}
+
+
+def dls(visited, graph, node,limit):
+    if node not in visited and depth[node]<=limit:
+        print(node)
+        visited.append(node)
+        if node == search :
+          sys.exit(0)
+        # print("explored: " ,end=" ")
+        # print(visited)
+        for neighbour in graph[node]:
+          if depth[neighbour]<=limit:
+            frontier.insert(len(visited)-1,neighbour)
+            # print("frontier:" ,end=" ")
+            # print(frontier)
+            dls(visited, graph, neighbour,limit)
+
+while 1:
+  visited = []
+  frontier=[]
+  print("\n")
+  dls(visited,graph,'A',limit)
+  limit=limit+1
+---------------------------------------------------------------------------------------------------
+kmeans & EM:
+
+
+
+from sklearn.cluster import KMeans
+from sklearn import preprocessing
+from sklearn.mixture import GaussianMixture
+from sklearn.datasets import load_iris
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+dataset=load_iris()
+X=pd.DataFrame(dataset.data)
+X.columns=['Sepal_Length','Sepal_Width','Petal_Length','Petal_Width']
+y=pd.DataFrame(dataset.target)
+y.columns=['Targets']
+plt.figure(figsize=(14,7))
+colormap=np.array(['gold','purple','red'])
+
+# REAL PLOT
+plt.subplot(1,3,1)
+plt.scatter(X.Petal_Length,X.Petal_Width,c=colormap[y.Targets],s=40)
+plt.title('Real')
+
+# EM PLOT
+scaler=preprocessing.StandardScaler()
+scaler.fit(X)
+xsa=scaler.transform(X)
+xs=pd.DataFrame(xsa,columns=X.columns)
+gmm=GaussianMixture(n_components=3)
+gmm.fit(xs)
+y_cluster_gmm=gmm.predict(xs)
+plt.subplot(1,3,3)
+plt.scatter(X.Petal_Length,X.Petal_Width,c=colormap[y_cluster_gmm],s=40)
+plt.title('EM Classification')
+
+# K Means
+plt.subplot(1,3,2)
+model=KMeans(n_clusters=3)
+model.fit(X)
+predY=np.choose(model.labels_,[0,1,2])
+plt.scatter(X.Petal_Length,X.Petal_Width,c=colormap[predY],s=40)
+plt.title('KMeans')
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+A* alogorithm-8 puzzle
+
+
+import copy
+from heapq import heappush, heappop
+
+n = 3
+
+rows = [ 1, 0, -1, 0 ]
+cols = [ 0, -1, 0, 1 ]
+
+class priorityQueue:
+
+    def __init__(self):
+        self.heap = []
+
+    def push(self, key):
+        heappush(self.heap, key)
+
+    def pop(self):
+        return heappop(self.heap)
+
+    def empty(self):
+        if not self.heap:
+            return True
+        else:
+            return False
+
+class nodes:
+
+    def __init__(self, parent, mats, empty_tile_posi,
+                costs, levels):
+
+        self.parent = parent
+
+        self.mats = mats
+
+        self.empty_tile_posi = empty_tile_posi
+
+        self.costs = costs
+
+        self.levels = levels
+
+    def __lt__(self, nxt):
+        return self.costs < nxt.costs
+
+def calculateCosts(mats, final) -> int:
+
+    count = 0
+    for i in range(n):
+        for j in range(n):
+            if ((mats[i][j]) and
+                (mats[i][j] != final[i][j])):
+                count += 1
+
+    return count
+
+def newNodes(mats, empty_tile_posi, new_empty_tile_posi,
+            levels, parent, final) -> nodes:
+
+    new_mats = copy.deepcopy(mats)
+
+    x1 = empty_tile_posi[0]
+    y1 = empty_tile_posi[1]
+    x2 = new_empty_tile_posi[0]
+    y2 = new_empty_tile_posi[1]
+    new_mats[x1][y1], new_mats[x2][y2] = new_mats[x2][y2], new_mats[x1][y1]
+
+    costs = calculateCosts(new_mats, final)
+
+    new_nodes = nodes(parent, new_mats, new_empty_tile_posi,
+                    costs, levels)
+    return new_nodes
+
+def printMatsrix(mats):
+
+    for i in range(n):
+        for j in range(n):
+            print("%d " % (mats[i][j]), end = " ")
+
+        print()
+
+def isSafe(x, y):
+
+    return x >= 0 and x < n and y >= 0 and y < n
+
+def printPath(root):
+
+    if root == None:
+        return
+
+    printPath(root.parent)
+    printMatsrix(root.mats)
+    print()
+
+def solve(initial, empty_tile_posi, final):
+
+    pq = priorityQueue()
+
+    costs = calculateCosts(initial, final)
+    root = nodes(None, initial,
+                empty_tile_posi, costs, 0)
+
+    pq.push(root)
+
+    while not pq.empty():
+
+        minimum = pq.pop()
+
+        if minimum.costs == 0:
+
+            printPath(minimum)
+            return
+
+        for i in range(n):
+            new_tile_posi = [
+                minimum.empty_tile_posi[0] + rows[i],
+                minimum.empty_tile_posi[1] + cols[i], ]
+
+            if isSafe(new_tile_posi[0], new_tile_posi[1]):
+
+                child = newNodes(minimum.mats,minimum.empty_tile_posi,new_tile_posi,minimum.levels + 1,minimum, final,)
+
+                pq.push(child)
+
+initial = [ [ 1, 2, 3 ],
+            [ 5, 6, 0 ],
+            [ 7, 8, 4 ] ]
+
+final = [ [ 1, 2, 3 ],
+        [ 5, 8, 6 ],
+        [ 0, 7, 4 ] ]
+
+empty_tile_posi = [ 1, 2 ]
+
+solve(initial, empty_tile_posi, final)
+------------------------------------------------------------------------------------------------------------------------
+genetic algorithm-8 queens
+
+
+
+
+
+
+
+
+
+import random
+
+
+POPULATION_SIZE = 50
+MUTATION_RATE = 0.1
+MAX_GENERATIONS = 100
+
+
+def generate_board_state():
+    board_state = [random.randint(0, 7) for _ in range(8)]
+    return board_state
+
+
+def calculate_fitness(board_state):
+    conflicts = 0
+    for i in range(8):
+        for j in range(i + 1, 8):
+            if board_state[i] == board_state[j] or abs(board_state[i] - board_state[j]) == j - i:
+                conflicts += 1
+    return 28 - conflicts  # Max fitness = 28 (no conflicts)
+
+
+def tournament_selection(population):
+    tournament_size = 5
+    tournament = random.sample(population, tournament_size)
+    return max(tournament, key=lambda x: x[1])
+
+# Crossover operation (single-point crossover)
+def crossover(parent1, parent2):
+    crossover_point = random.randint(1, 7)
+    child = parent1[:crossover_point] + parent2[crossover_point:]
+    return child
+
+# Mutation operation (swap two positions)
+def mutate(board_state):
+    pos1, pos2 = random.sample(range(8), 2)
+    board_state[pos1], board_state[pos2] = board_state[pos2], board_state[pos1]
+    return board_state
+
+# Generate the initial population
+population = [(generate_board_state(), 0) for _ in range(POPULATION_SIZE)]
+
+# Main Genetic Algorithm loop
+for generation in range(MAX_GENERATIONS):
+    # Calculate fitness for each board state
+    population = [(board_state, calculate_fitness(board_state)) for board_state, _ in population]
+
+    # Check if solution is found
+    best_board_state = max(population, key=lambda x: x[1])[0]
+    if calculate_fitness(best_board_state) == 28:
+        print("Solution found in generation", generation)
+        break
+
+    # Create the next generation
+    new_population = []
+
+    # Elitism: Keep the best board state from the previous generation
+    new_population.append(max(population, key=lambda x: x[1]))
+
+    # Perform selection, crossover, and mutation
+    while len(new_population) < POPULATION_SIZE:
+        parent1 = tournament_selection(population)
+        parent2 = tournament_selection(population)
+        child = crossover(parent1[0], parent2[0])
+        if random.random() < MUTATION_RATE:
+            child = mutate(child)
+        new_population.append((child, 0))
+
+    # Update the population
+    population = new_population
+
+# Print the best solution
+print("Best solution:", best_board_state)
+------------------------------------------------------------------------------------------------------
+
+minmax-tic-tac-toe:
+
+
+import numpy as np
+import random
+from time import sleep
+def create_board():
+    return(np.array([[0, 0, 0],
+                    [0, 0, 0],
+                    [0, 0, 0]]))
+def possibilities(board):
+    l = []
+    for i in range(len(board)):
+        for j in range(len(board)):
+            if board[i][j] == 0:
+                l.append((i, j))
+    return(l)
+def random_place(board, player):
+    selection = possibilities(board)
+    current_loc = random.choice(selection)
+    board[current_loc] = player
+    return(board)
+def row_win(board, player):
+    for x in range(len(board)):
+        win = True
+        for y in range(len(board)):
+            if board[x, y] != player:
+                win = False
+                break
+        if win == True:
+            return(win)
+    return(win)
+def col_win(board, player):
+    for x in range(len(board)):
+        win = True
+        for y in range(len(board)):
+            if board[y][x] != player:
+                win = False
+                break
+
+        if win == True:
+            return(win)
+    return(win)
+def diag_win(board, player):
+    win = True
+    y = 0
+    for x in range(len(board)):
+        if board[x][ x] != player:
+            win = False
+    if win:
+        return win
+    win = True
+    if win:
+        for x in range(len(board)):
+            y = len(board) - 1 - x
+            if board[x][y] != player:
+                win = False
+    return win
+
+def evaluate(board):
+    winner = 0
+    for player in [1, 2]:
+        if (row_win(board, player) or col_win(board, player) or diag_win(board, player)):
+            winner = player
+    if np.all(board != 0) and winner == 0:
+        winner = -1
+    return winner
+
+def play_game():
+    board, winner, counter = create_board(), 0, 1
+    print(board)
+    sleep(2)
+    while winner == 0:
+        for player in [1, 2]:
+            board = random_place(board, player)
+            print("Board after " ,counter, " move")
+            print(board)
+            sleep(2)
+            counter += 1
+            winner = evaluate(board)
+            if winner != 0:
+                break
+    return(winner)
+print("Winner is: ", play_game())
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+alpha beta pruning:
+
+
+MAX, MIN = 1000, -1000
+count1=0
+count2=0
+def minimax(depth, nodeIndex, maximizingPlayer, values, alpha, beta):
+    global count1,count2;
+    if depth == 3:
+        return values[nodeIndex]
+    if maximizingPlayer:
+        best = MIN
+        for i in range(0, 2):
+            val = minimax(depth + 1, nodeIndex * 2 + i, False, values, alpha, beta)
+            best = max(best, val)
+            alpha = max(alpha, best)
+            if beta <= alpha:
+                count1+=1
+                break
+        return best
+    else:
+        best = MAX
+        for i in range(0, 2):
+            val = minimax(depth + 1, nodeIndex * 2 + i, True, values, alpha, beta)
+            best = min(best, val)
+            beta = min(beta, best)
+            if beta <= alpha:
+                count2+=1
+                break
+        return best
+
+if __name__ == "__main__":
+    values = [3, 5, 6, 9, 1, 2, 0, -1]
+    print("The optimal value is :", minimax(0, 0, True, values, MIN, MAX))
+    print("no. of alpha cuts :" ,count1)
+    print("no. of beta cuts :" ,count2)
+----------------------------------------------------------------------------------------------------------------------------------
+
+
+mini max:
+
+
+
+MAX, MIN = 1000, -1000
+
+def minimax(depth, nodeIndex, maximizingPlayer, values):
+    if depth == 3:
+        return values[nodeIndex]
+    if maximizingPlayer:
+        best = MIN
+        for i in range(0, 2):
+            val = minimax(depth + 1, nodeIndex * 2 + i, False, values)
+            best = max(best, val)
+        return best
+    else:
+        best = MAX
+        for i in range(0, 2):
+            val = minimax(depth + 1, nodeIndex * 2 + i, True, values)
+            best = min(best, val)
+        return best
+
+if __name__ == "__main__":
+    values =  [3, 5, 2, 9, 12, 5, 23, 23]
+    print("The optimal value is :", minimax(0, 0, True, values))
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+
+missionaries and cannibels:
+
+
+
+from collections import deque
+def is_valid(state):
+    m, c, b = state
+    return (m >= 0 and c >= 0 and (m == 0 or m >= c) and (3 - m) >= 0 and (3 - c) >= 0 and (3 - m == 0 or (3 - m) >= (3 - c)))
+def successors(state):
+    m, c, b = state
+    next_states = []
+    if b == 1:
+        next_states.extend([(m - 1, c, 0), (m, c - 1, 0), (m - 1, c - 1, 0), (m - 2, c, 0), (m, c - 2, 0)])
+    else:
+        next_states.extend([(m + 1, c, 1), (m, c + 1, 1), (m + 1, c + 1, 1), (m + 2, c, 1), (m, c + 2, 1)])
+    return [state for state in next_states if is_valid(state)]
+def breadth_first_search():
+    start_state = (3, 3, 1)
+    goal_state = (0, 0, 0)
+    queue = deque([(start_state, [start_state])])
+    visited = set()
+    while queue:
+        current_state, path = queue.popleft()
+        if current_state == goal_state:
+            return path
+        if current_state not in visited:
+            visited.add(current_state)
+            for next_state in successors(current_state):
+                queue.append((next_state, path + [next_state]))
+def revstate(state):
+  a,b,c=state
+  return (3-a,3-b,1-c)
+if __name__ == "__main__":
+    solution = breadth_first_search()
+    print("Solution:")
+    for state in solution:
+        print(state,"----------\______/----------",revstate(state))
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+water jug:
+
+
+
+
+
+def pour_water(juga, jugb):
+  max1, max2, cap = 3, 4, 2
+  print(juga,"\t",jugb)
+  if jugb==cap:
+    return
+  elif jugb==max2:
+    pour_water(0, juga)
+  elif juga!=0 and jugb==0:
+    pour_water(0, juga)
+  elif juga==cap:
+    pour_water(juga, 0)
+  elif juga<max1:
+    pour_water(max1, jugb)
+  elif juga<(max2-jugb):
+     pour_water(0, (juga+jugb))
+  else:
+    pour_water(juga-(max2-jugb), max2)
+
+print("Jug A \tJug B")
+pour_water(0,0)
+-----------------------------------------------------------------------------------------------------------------------------------------
